@@ -16,6 +16,8 @@ A __package__ is a collection (a directory) of Python modules. There are two typ
 - __namespace packages__ (only for very special use cases) don't require a ``__init__.py`` file
 
 ## Useful articles about Python imports
+- [Python Modules and Packages – An Introduction](https://realpython.com/python-modules-packages/)
+
 - [How to Fix ModuleNotFoundError and ImportError](https://towardsdatascience.com/how-to-fix-modulenotfounderror-and-importerror-248ce5b69b1c)
 
 - Why isn't VSCode adding the `project_path` automatically? [PYTHONPATH in VSCode – everything you need to know](https://linuxpip.org/vscode-pythonpath/) 
@@ -51,9 +53,8 @@ The `test_module2.py` is located beside the `module2.py`. There is no issue when
 from module2 import func2
 ```
 ```
-C:\Users\s00110656\Desktop\python\Python_Import\project2_import_module>python package2\test_module2.py   --> works
-
-C:\Users\s00110656\Desktop\python\Python_Import\project2_import_module>pytest             --> works
+C:\Users\s00110656\Desktop\python\Python_Import\project2_import_module>python package2\test_module2.py  --> works
+C:\Users\s00110656\Desktop\python\Python_Import\project2_import_module>pytest                           --> works
 ```
 --> all good!
 
@@ -69,19 +70,22 @@ C:\Users\s00110656\Desktop\python\Python_Import\project3_absolute>pytest        
 
 However, executing as a script fails: 
 ```
-C:\Users\s00110656\Desktop\python\Python_Import\project3_absolute>python tests\test_module3.py  --> ModuleNotFoundError
+C:\Users\s00110656\Desktop\python\Python_Import\project3_absolute>python tests\test_module3.py   --> ModuleNotFoundError
 ```
-In order to get it running, the projects directory has to be added to the `PYTHONPATH`. It can be checked by
+In order to solve this, we have to unserstand the Python's `import` search path...
+# Import search path
+When executing an import statement, and the resource is not within the __current directory__, it's path needs to be within the __`PYTHONPATH`__. that can be checked by
 ```Python
 sys.path
 ```
-and it can even be added at runtime, but that is discouraged:
-```Python
-sys.path.append("PATH_TO_PROJECT_ROOT_DIR")    # Don't do this!
-```
+If the resources path is not there, Phython can import it, resulting in an `ModuleNotFoundError` or `ImportError`. There are three ways to solve this
 
-## Add to PYTHONPATH permanently
-Add a `fily.pth` with the absolute path to the projects root dir to the `site-packages` directory of the conda environment, like this:
+## 1. Set PYTHONPATH in environment variables
+Setting the `PYTHONPATH` within the global __environment varibales__ requires admin rights, but one can also add one in the __user environment variables__: [How to set Path in Windows without admin rights](
+https://kscodes.com/misc/how-to-set-path-in-windows-without-admin-rights/)
+
+## 2. Add a `file.pth` to `site-packages` 
+Add a `file.pth` with the absolute path to the projects root dir to the `site-packages` directory of the conda environment, like this:
 ```
 # conda.pth  (ANY_NAME.pth)
 # located in C:\ProgramData\Anaconda3\envs\ENV_NAME\Lib\site-packages
@@ -91,7 +95,14 @@ The same can be accomplished by using this conda command:
 ```
 conda develop PATH_TO_PROJECT_DIR
 ```
+## 3. `sys.path.append()` at runtime 
+The `PYTHONPATH` can be modified at runtime. 
 
-
+Using this approach gets a little messy, because the `sys.path.append()` has to happen before the actual import:
+```Python
+import sys
+sys.path.append("PATH_TO_CUSTOM_PACKAGE")   
+import custom_package
+```
 
 
